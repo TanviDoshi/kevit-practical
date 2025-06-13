@@ -34,6 +34,7 @@ dependencies:
   flutter_screenutil: ^5.9.0
   dio: ^5.5.0+1
   smooth_page_indicator: ^1.2.0
+  flutter_svg: ^2.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -60,6 +61,18 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  fonts:
+    - family: mediumFont
+      fonts:
+        - asset: assets/fonts/poppins_medium.ttf
+    - family: semiBoldFont
+      fonts:
+        - asset: assets/fonts/poppins_semibold.ttf
+    - family: regularFont
+      fonts:
+        - asset: assets/fonts/poppins_regular.ttf
+  assets:
+    - assets/images/login_vector.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
