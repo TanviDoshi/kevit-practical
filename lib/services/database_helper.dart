@@ -14,8 +14,10 @@ class DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDB('social_feed.db');
+    List<FeedPost> posts = [];
 
-    await insertFeedPostList(); // Insert initial data if needed
+    posts = getInitialFeedPost();
+    await insertFeedPostList(posts); // Insert initial data if needed
     return _database!;
   }
 
@@ -200,10 +202,8 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> insertFeedPostList() async {
-    List<FeedPost> posts = [];
+  Future<void> insertFeedPostList(List<FeedPost> posts) async {
 
-    posts = getInitialFeedPost();
     final db = await database;
 
     final existing = await db.query('feed_post');
@@ -233,6 +233,28 @@ class DatabaseHelper {
         });
       }
     }
+  }
+
+  Future<int> insertFeedPostData(FeedPost post) async {
+
+    final db = await database;
+
+    final postId = await db.insert('feed_post', {
+        'username': post.username,
+        'caption': post.caption,
+        'like_count': post.likeCount,
+        'isLikedByUser': post.isLikedByUser ? 1 : 0,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+
+      for (var image in post.images) {
+        await db.insert('feed_images', {
+          'image_path': image.imagePath,
+          'feed_id': postId,
+        });
+
+    }
+      return postId;
   }
 
   List<FeedPost> getInitialFeedPost() {

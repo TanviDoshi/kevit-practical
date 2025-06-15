@@ -8,10 +8,12 @@ import 'package:kevit_insta_feed/utils/constants.dart';
 import '../models/feed_comment.dart';
 import '../models/feed_post.dart';
 
+import '../routes/app_routes.dart';
 import '../services/database_helper.dart';
+import '../services/gallery_saver.dart';
 import '../utils/color_constants.dart';
 
-class FeedViewController extends GetxController {
+class FeedViewController extends GetxController{
   final Map<int, PageController> pageControllers = {};
   List<FeedPost> feedPostList = [];
   bool isLoading = false;
@@ -28,7 +30,10 @@ class FeedViewController extends GetxController {
     super.onInit();
   }
 
+
+
   fetchDataFromDB() async {
+    print('Fetching data from database');
     isLoading = true;
     update();
     Future.delayed(Duration(seconds: 5));
@@ -131,27 +136,25 @@ class FeedViewController extends GetxController {
     }
   }
 
-  /*Future<void> downloadAndSaveImage(String imageUrl) async {
-    // Ask for permissions
-    if (await PermissionUtils().getRequiredStoragePermission()) {
-      try {
-        final response = await http.get(Uri.parse(imageUrl));
-        if (response.statusCode == 200) {
-          final Uint8List imageData = response.bodyBytes;
-          final result = await ImageGallerySaver.saveImage(
-            imageData,
-            quality: 100,
-            name: "downloaded_image_${DateTime.now().millisecondsSinceEpoch}",
-          );
-          print("Image saved: $result");
-        } else {
-          print("Image download failed: ${response.statusCode}");
-        }
-      } catch (e) {
-        print("Error downloading image: $e");
-      }
-    } else {
-      print("Permission not granted");
+  navigateToAddFeedView() async{
+    var result = await Routes.navigateToAddFeedView() as bool;
+    if(result == true){
+      fetchDataFromDB();
     }
-  }*/
+  }
+
+  Future<void> saveToGallery(String filePath) async {
+
+    final success = await GallerySaver.saveImage(filePath);
+    if (success == true) {
+      Get.snackbar('Success', 'Image saved to gallery');
+    } else {
+      Get.snackbar('Error', 'Failed to save image');
+    }
+  }
+
+   logoutUser() async {
+    await storage.clear();
+    Routes.navigateToLoginView();
+   }
 }

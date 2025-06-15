@@ -1,6 +1,8 @@
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:kevit_insta_feed/bindings/add_feed_view_binding.dart';
 import 'package:kevit_insta_feed/bindings/login_binding.dart';
 import 'package:kevit_insta_feed/views/auth/login_view.dart';
+import 'package:kevit_insta_feed/views/dashboard/add_feed_view.dart';
 
 import '../bindings/feed_view_binding.dart';
 import '../utils/route_constants.dart';
@@ -21,6 +23,15 @@ class Pages{
         popGesture: true,
         binding: FeedViewBinding(),
         showCupertinoParallax: true),
+
+    GetPage(
+        name: RouteConstants.addFeedView,
+        page: () => AddFeedView(),
+        popGesture: true,
+        binding: AddFeedViewBinding(),
+        showCupertinoParallax: true),
+
+
 
 
   ];

@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'get_permissions.dart';
+
 class PermissionUtils{
-  Future<bool> getRequiredStoragePermission() async {
+  static Future<bool> getDownloadStoragePermission() async {
     bool storageStatus = false;
     if (Platform.isAndroid) {
       final deviceInfo = await DeviceInfoPlugin().androidInfo;
@@ -22,7 +24,7 @@ class PermissionUtils{
     return storageStatus;
   }
 
-  Future<bool> getStoragePermission() async {
+  static Future<bool> getStoragePermission() async {
     PermissionStatus permissionStatus = await Permission.storage.status;
     print("Permission status -- $permissionStatus");
     if (permissionStatus.isGranted) {
@@ -37,5 +39,27 @@ class PermissionUtils{
       }
     }
     return false;
+  }
+
+  static Future<bool> getRequiredStoragePermission() async{
+    bool storageStatus = false;
+    if(Platform.isAndroid){
+      final deviceInfo = await DeviceInfoPlugin().androidInfo;
+      if(deviceInfo.version.sdkInt >=33){
+        storageStatus = true;
+      }
+      else if (deviceInfo.version.sdkInt > 32) {
+        storageStatus =
+        await GetPermissions.getPhotoPermission();
+      }else{
+        storageStatus =
+        await GetPermissions.getStoragePermission();
+      }
+    }else if(Platform.isIOS){
+      storageStatus =
+      await GetPermissions.getStoragePermission();
+    }
+    return storageStatus;
+
   }
 }

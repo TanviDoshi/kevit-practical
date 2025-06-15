@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,207 +12,343 @@ import '../../models/feed_comment.dart';
 import '../../models/feed_post.dart';
 import '../../utils/color_constants.dart';
 import '../../utils/date_utils.dart';
+import '../../utils/permission_utils.dart';
 import '../widgets/font_styles.dart';
 import '../widgets/progress_view_widget.dart';
 import '../widgets/text_view_widget.dart';
+class FeedView extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() => FeedViewState();
 
-class FeedView extends StatelessWidget{
+}
+class FeedViewState extends State<FeedView> with WidgetsBindingObserver{
+
+  FeedViewController controller = Get.put(FeedViewController());
+  @override
+  void initState() {
+
+    super.initState();
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print('state -- $state');
+    if (state == AppLifecycleState.resumed) {
+      print('App resumed');
+      controller.fetchDataFromDB();
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return GetBuilder<FeedViewController>(
       builder: (controller) {
         return Scaffold(
           body: SafeArea(
-            child: Column(
+            child: Stack(
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/images/ic_create_post.svg',
-                        width: 25.sp,
-                        height: 25.sp,
-                      ),
-                      TextViewWidget(text: 'Feed', textStyle: FontStyles.fontSemiBoldTextStyle(textSize: 20.sp,color: ColorConstants.colorSecondary)),
-                      SvgPicture.asset(
-                        'assets/images/ic_logout.svg',
-                        width: 25.sp,
-                        height: 25.sp,
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(),
-                Expanded(child: ListView.builder(
-                  itemCount: controller.feedPostList.length,
-                  shrinkWrap: true,
-                  physics: ScrollPhysics(),
-
-                  itemBuilder: (context, index) {
-                    controller.pageControllers.putIfAbsent(
-                      index,
-                          () => PageController(viewportFraction: 1),
-                    );
-                    var currentPost = controller.feedPostList[index];
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.sp, horizontal: 8.sp),
-                          child: Row(
+                Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.sp, vertical: 8.sp),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              Image.asset(
-                                'assets/images/ic_user.png',
-                                height: 40.sp,
-                                width: 40.sp,
+                              GestureDetector(
+                                onTap: () {
+                                 controller.navigateToAddFeedView();
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/images/ic_create_post.svg',
+                                  width: 25.sp,
+                                  height: 25.sp,
+                                ),
                               ),
                               SizedBox(width: 8.sp),
-                              TextViewWidget(
-                                text: currentPost.username,
-                                textStyle: FontStyles.fontRegularTextStyle(textSize: 14.sp, color: ColorConstants.colorTextPrimary),
+                              IconButton(onPressed: (){
+                                controller.fetchDataFromDB();
+                              }, icon: Icon(Icons.refresh,color: ColorConstants.colorTextPrimary,size: 30.sp,)),
+                            ],
+                          ),
+                          TextViewWidget(text: 'Feed', textStyle: FontStyles.fontSemiBoldTextStyle(textSize: 20.sp,color: ColorConstants.colorSecondary)),
+                          Row(
+                            children: [
+                              SizedBox(width: 38.sp,),
+                              GestureDetector(
+                                onTap: (){
+                                  showLogoutDialog(onLogoutTap: (){
+                                    controller.logoutUser();
+                                  });
+                                },
+                                child: SvgPicture.asset(
+                                  'assets/images/ic_logout.svg',
+                                  width: 25.sp,
+                                  height: 25.sp,
+                                ),
                               ),
 
                             ],
                           ),
-                        ),
-                        SizedBox(
-                            height: Get.width,
-                            width:Get.width,
-                            child: PageView.builder(itemBuilder: (context, pageIndex) {
-                              return CachedNetworkImage(imageUrl:currentPost.images[pageIndex].imagePath,
-                                height: Get.width,
-                                width:Get.width,
-                                fit: BoxFit.fill,
-                                placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                errorWidget: (context, url, error) => Icon(Icons.error),);
-                               /* Image.asset(
-                                'assets/images/img_dummy_2.jpg',
-                                height: Get.width,
-                                width:Get.width,
-                                fit: BoxFit.cover,
-                              );*/
-                            }, itemCount: currentPost.images.length, controller: controller.pageControllers[index]
-                            )
-                        ),
-                        Center(
-                          child: Padding(
-                            padding:EdgeInsets.symmetric(horizontal: 5.sp,vertical: 8.sp),
-                            child: SmoothPageIndicator(
-                              controller: controller.pageControllers[index]!, // PageController
-                              count: currentPost.images.length, // Number of images
-                              effect: WormEffect(
-                                  dotHeight: 7.sp,
-                                  dotWidth: 7.sp,
-                                  spacing: 5.sp,
-                                  activeDotColor: ColorConstants.colorSecondary,
-                                  dotColor: ColorConstants.colorTextSecondary),
-                            ),
-                          ),
-                        ),
+                        ],
+                      ),
+                    ),
+                    Divider(),
+                    Expanded(child: ListView.builder(
+                      itemCount: controller.feedPostList.length,
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
 
-                        Padding(
-                          padding:EdgeInsets.symmetric(horizontal: 8.sp),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
+                      itemBuilder: (context, index) {
+                        controller.pageControllers.putIfAbsent(
+                          index,
+                              () => PageController(viewportFraction: 1),
+                        );
+                        var currentPost = controller.feedPostList[index];
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.sp, horizontal: 8.sp),
+                              child: Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: (){
-                                      controller.likeDislikePost(feedId: currentPost.id, isLiked: currentPost.isLikedByUser, listIndex: index);
+                                  Image.asset(
+                                    'assets/images/ic_user.png',
+                                    height: 40.sp,
+                                    width: 40.sp,
+                                  ),
+                                  SizedBox(width: 8.sp),
+                                  TextViewWidget(
+                                    text: currentPost.username,
+                                    textStyle: FontStyles.fontRegularTextStyle(textSize: 14.sp, color: ColorConstants.colorTextPrimary),
+                                  ),
 
-                                    },
-                                    child: SvgPicture.asset(
-                                      currentPost.isLikedByUser ?'assets/images/ic_heart_fill.svg' :'assets/images/ic_heart.svg',
-                                      width: 25.sp,
-                                      height: 25.sp,
-                                      colorFilter: ColorFilter.mode(
-                                        currentPost.isLikedByUser ? ColorConstants.colorSecondary : ColorConstants.colorTextPrimary,
-                                        BlendMode.srcIn,
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                                height: Get.width,
+                                width:Get.width,
+                                child: PageView.builder(itemBuilder: (context, pageIndex) {
+                                  return CachedNetworkImage(imageUrl:currentPost.images[pageIndex].imagePath,
+                                    height: Get.width,
+                                    width:Get.width,
+                                    fit: BoxFit.fill,
+                                    placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                                    errorWidget: (context, url, error) => Image.file(
+                                      File(currentPost.images[pageIndex].imagePath),
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return const Text('Image not found');
+                                      },
+                                    ));
+                                   /* Image.asset(
+                                    'assets/images/img_dummy_2.jpg',
+                                    height: Get.width,
+                                    width:Get.width,
+                                    fit: BoxFit.cover,
+                                  );*/
+                                }, itemCount: currentPost.images.length, controller: controller.pageControllers[index]
+                                )
+                            ),
+                            Center(
+                              child: Padding(
+                                padding:EdgeInsets.symmetric(horizontal: 5.sp,vertical: 8.sp),
+                                child: SmoothPageIndicator(
+                                  controller: controller.pageControllers[index]!, // PageController
+                                  count: currentPost.images.length, // Number of images
+                                  effect: WormEffect(
+                                      dotHeight: 7.sp,
+                                      dotWidth: 7.sp,
+                                      spacing: 5.sp,
+                                      activeDotColor: ColorConstants.colorSecondary,
+                                      dotColor: ColorConstants.colorTextSecondary),
+                                ),
+                              ),
+                            ),
+
+                            Padding(
+                              padding:EdgeInsets.symmetric(horizontal: 8.sp),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: (){
+                                          controller.likeDislikePost(feedId: currentPost.id, isLiked: currentPost.isLikedByUser, listIndex: index);
+
+                                        },
+                                        child: SvgPicture.asset(
+                                          currentPost.isLikedByUser ?'assets/images/ic_heart_fill.svg' :'assets/images/ic_heart.svg',
+                                          width: 25.sp,
+                                          height: 25.sp,
+                                          colorFilter: ColorFilter.mode(
+                                            currentPost.isLikedByUser ? ColorConstants.colorSecondary : ColorConstants.colorTextPrimary,
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      SizedBox(width: 8.sp),
+                                      TextViewWidget(
+                                        text: currentPost.likeCount.toString(),
+                                        textStyle: FontStyles.fontRegularTextStyle(textSize: 14.sp, color: ColorConstants.colorTextSecondary),
+                                      ),
+                                      SizedBox(width: 12.sp),
+                                      GestureDetector(
+                                        onTap: (){
+                                          showCommentsSheet(context,currentPost,index);
+                                        },
+                                        child: SvgPicture.asset(
+                                          'assets/images/ic_comment.svg',
+                                          width: 25.sp,
+                                          height: 25.sp,
+                                          colorFilter: ColorFilter.mode(
+                                            ColorConstants.colorTextPrimary,
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8.sp),
+                                      TextViewWidget(
+                                        text: currentPost.comments.length.toString(),
+                                        textStyle: FontStyles.fontRegularTextStyle(textSize: 14.sp, color: ColorConstants.colorTextSecondary),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(width: 8.sp),
-                                  TextViewWidget(
-                                    text: currentPost.likeCount.toString(),
-                                    textStyle: FontStyles.fontRegularTextStyle(textSize: 14.sp, color: ColorConstants.colorTextSecondary),
-                                  ),
-                                  SizedBox(width: 12.sp),
                                   GestureDetector(
-                                    onTap: (){
-                                      showCommentsSheet(context,currentPost,index);
-                                    },
+                                    onTap:() async{
+                                      if(await PermissionUtils.getDownloadStoragePermission() == true) {
+                                        controller.saveToGallery(
+                                         currentPost.images[0].imagePath,
+                                        );
+                                      } else {
+                                        Get.rawSnackbar(
+                                          message: "Storage permission is required to download the image.",
+                                          snackPosition: SnackPosition.BOTTOM,
+                                          backgroundColor: ColorConstants.colorPrimary,
+                                        );
+                                      }
+                        },
                                     child: SvgPicture.asset(
-                                      'assets/images/ic_comment.svg',
+                                      'assets/images/ic_download.svg',
                                       width: 25.sp,
                                       height: 25.sp,
-                                      colorFilter: ColorFilter.mode(
-                                        ColorConstants.colorTextPrimary,
-                                        BlendMode.srcIn,
-                                      ),
                                     ),
-                                  ),
-                                  SizedBox(width: 8.sp),
-                                  TextViewWidget(
-                                    text: currentPost.comments.length.toString(),
-                                    textStyle: FontStyles.fontRegularTextStyle(textSize: 14.sp, color: ColorConstants.colorTextSecondary),
                                   ),
                                 ],
                               ),
-                              SvgPicture.asset(
-                                'assets/images/ic_download.svg',
-                                width: 25.sp,
-                                height: 25.sp,
+                            ),
+                           currentPost.caption.isNotEmpty ? Padding(padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 8.sp),
+                              child: TextViewWidget(
+                                text: currentPost.caption ?? '',
+                                textStyle: FontStyles.fontRegularTextStyle(textSize: 13.sp, color: ColorConstants.colorTextPrimary),
+                                textAlign: TextAlign.start,
+                                maxLines: 3,
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 8.sp),
-                          child: TextViewWidget(
-                            text: currentPost.caption ?? '',
-                            textStyle: FontStyles.fontRegularTextStyle(textSize: 13.sp, color: ColorConstants.colorTextPrimary),
-                            textAlign: TextAlign.start,
-                            maxLines: 3,
-                          ),
 
-                        ),
-                        Padding(padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 1.sp),
-                          child: TextViewWidget(
-                            text: DateUtil.toPrettyDateFromIso(currentPost.createdAt ?? ''),
-                            textStyle: FontStyles.fontRegularTextStyle(textSize: 12.sp, color: ColorConstants.colorTextSecondary),
-                            textAlign: TextAlign.start,
-                            maxLines: 3,
+                            ) : SizedBox(height: 8.sp),
+                            Padding(padding: EdgeInsets.symmetric(horizontal: 8.sp, vertical: 1.sp),
+                              child: TextViewWidget(
+                                text: DateUtil.toPrettyDateFromIso(currentPost.createdAt ?? ''),
+                                textStyle: FontStyles.fontRegularTextStyle(textSize: 12.sp, color: ColorConstants.colorTextSecondary),
+                                textAlign: TextAlign.start,
+                                maxLines: 3,
+                              ),
+
+                            ),
+                            SizedBox(
+                              height: 10.sp,
+                            ),
+
+                          ],
+                        );
+                        /*return ListTile(
+                          leading: Image.asset('assets/images/ic_user.png',height: 45.sp,width: 45.sp,),
+                          title: TextViewWidget(
+                            text: 'tanu3499',
+                            textStyle: FontStyles.fontSemiBoldTextStyle(textSize: 16.sp, color: ColorConstants.colorPrimary),
                           ),
-
-                        ),
-                        SizedBox(
-                          height: 10.sp,
-                        ),
-
-                      ],
-                    );
-                    /*return ListTile(
-                      leading: Image.asset('assets/images/ic_user.png',height: 45.sp,width: 45.sp,),
-                      title: TextViewWidget(
-                        text: 'tanu3499',
-                        textStyle: FontStyles.fontSemiBoldTextStyle(textSize: 16.sp, color: ColorConstants.colorPrimary),
-                      ),
-                      subtitle: TextViewWidget(
-                        text: 'Posted a new photo',
-                        textStyle: FontStyles.fontRegularTextStyle(textSize: 14.sp, color: ColorConstants.colorTextSecondary),
-                      ),
-                    );*/
-                  }
-                )),
+                          subtitle: TextViewWidget(
+                            text: 'Posted a new photo',
+                            textStyle: FontStyles.fontRegularTextStyle(textSize: 14.sp, color: ColorConstants.colorTextSecondary),
+                          ),
+                        );*/
+                      }
+                    )),
+                  ],
+                ),
+                controller.isLoading
+                    ? Center(child: ProgressViewWidget())
+                    : SizedBox.shrink(),
               ],
             )
           ),
         );
       }
     );
+
   }
+
+  showLogoutDialog({required Function() onLogoutTap}) {
+    return Get.dialog(Dialog(
+      backgroundColor: ColorConstants.colorTextWhite,
+      insetPadding: EdgeInsets.symmetric(horizontal: 10.sp),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.sp),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16.sp),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          TextViewWidget(
+            text: 'Logout',
+            textStyle: FontStyles.fontMediumTextStyle(
+                textSize: 18.sp, color: ColorConstants.colorTextPrimary),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 10.sp),
+            child: TextViewWidget(
+              text: 'Are you sure you want to logout ?',
+              textStyle: FontStyles.fontRegularTextStyle(
+                  textSize: 16.sp, color: ColorConstants.colorTextPrimary),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10.sp),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Get.back();
+                  },
+                  child: TextViewWidget(
+                      text: "Cancel",
+                      textStyle: FontStyles.fontRegularTextStyle(
+                          textSize: 14.sp,
+                          color: ColorConstants.colorTextPrimary)),
+                ),
+                SizedBox(
+                  width: 16.sp,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    onLogoutTap();
+                    Get.back();
+                  },
+                  child: TextViewWidget(
+                      text: "Logout",
+                      textStyle: FontStyles.fontRegularTextStyle(
+                          textSize: 14.sp, color: ColorConstants.colorPrimary)),
+                )
+              ],
+            ),
+          )
+        ]),
+      ),
+    ));
+  }
+
 
   void showCommentsSheet(BuildContext context,FeedPost currentItem,int index) {
     final controller = Get.put(FeedViewController());
@@ -408,4 +546,6 @@ class CommentTile extends StatelessWidget {
       ),
     );
   }
+
+
 }
