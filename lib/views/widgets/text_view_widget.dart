@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 
 class TextViewWidget extends StatelessWidget {
-  final String text;
-  final TextStyle? style;
-  final TextAlign? textAlign;
-  int maxLines = 50;
+  String text;
+  TextStyle textStyle;
+  int maxLines;
+  int lines;
+  TextAlign textAlign;
 
-  TextViewWidget({
-    required this.text,
-    this.style,
-    this.textAlign,
-    this.maxLines = 50,
-  });
+  TextViewWidget(
+      {super.key, required this.text,
+        required this.textStyle,
+        this.maxLines = 20,
+        this.lines = 1,
+        this.textAlign = TextAlign.center});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class TextViewWidget extends StatelessWidget {
       text,
       maxLines: maxLines,
       overflow: TextOverflow.ellipsis,
-      style: style,
+      style: textStyle,
       textAlign: textAlign,
     );
   }

@@ -1,34 +1,23 @@
 import 'dart:ui';
 
 class ColorConstants{
-  static const colorScreenBackground = Color(0xFFFAEEEF);
-  static const colorPrimary = Color(0xFFE30016);
+  static const colorScreenBackground = Color(0xFFFFFFFF);
+  static const colorPrimary = Color(0xFFA259FF);
+  static const colorSecondary = Color(0xFFFF5E84);
+  static const colorTextPrimary = Color(0xFF1C1C1C);
+  static const colorTextSecondary = Color(0xFF7D7D7D);
+  static const colorTextWhite = Color(0xFFF8FBFF);
+  static const colorBorderBlue = Color(0xFF0A66C2);
+  static const colorBorderGray = Color(0xFF8C8C8C);
+  static const colorTextError = Color(0xFFFF3B3B);
+  static const colorLightGray = Color(0xFFEBEBEB);
   static const colorWhite = Color(0xFFFFFFFF);
-  static const colorTextPrimary = Color(0xFF3D3A3A);
-  static const colorTextSecondary = Color(0xFFA4a49c);
-
-  static const colorTextTertiary = Color(0xFF9A9A9A);
-  static const colorTextLightGray = Color(0xFF969696);
-  static const colorTextYellow = Color(0xFFFFDB9E);
-  static const colorSeparator = Color(0xFF949494);
-  static const colorButton = Color(0xFFFFDB9E);
-  static const colorTextButton = Color(0xFF111111);
-  static const colorBackArrow = Color(0xFFAF7F31);
-  static const colorWhiteOpacity = Color(0x1AFFFFFF);
-  static const colorBottomNavigation = Color(0x80575757);
-  static const unSelectedIcon = Color(0xFFA7A7A7);
-  static const searchBarColor = Color(0xFF4B4B4B);
-  static const strokeColor = Color(0xFFBFBFBF);
-  static const appBarTitleColor = Color(0xFFFFDB9E);
-  static const colorBlack = Color(0xFF000000);
-  static const colorTextGreen = Color(0xFF98D169);
-  static const colorYellowStroke = Color(0xFFF5C677);
-  static const colorYellowFill = Color(0xFFAF7F31);
-  static const colorYellowContainer = Color(0xFFF5C677);
-  static const colorContainerGreen = Color(0xFF638646);
-  static const colorLightGreen = Color(0xFFC6E9A8);
-  static const colorLightRed = Color(0xFFE17171);
-  static const colorNotificationIcon = Color(0xFFF5C677);
-  static const colorCircularIndicator = Color(0xFFAF7F31);
-
+  static const colorIconNormal = Color(0xFF373737);
+  static const colorIconSelected = Color(0xFF0A66C2);
+  static const colorContainerGray = Color(0xFFF1F2F4);
+  static const colorTextBlue = Color(0xFF0A66C2);
+  static const colorTextTertiary = Color(0xFF3D3D3D);
+  static const colorDarkBlue = Color(0xFF07427C);
+  static const colorTextRed = Color(0xFFAF0006);
+  static const Color colorOffWhite = Color(0xFFF2F0EF);
 }
