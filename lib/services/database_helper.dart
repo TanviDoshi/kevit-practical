@@ -88,11 +88,13 @@ class DatabaseHelper {
 
   Future<int> insertFeedComment({
     required String comment,
+    required String userName,
     required int feedId,
   }) async {
     final db = await database;
     return await db.insert('feed_comment', {
       'comment': comment,
+      'username': userName,
       'feed_id': feedId,
     });
   }
@@ -226,6 +228,7 @@ class DatabaseHelper {
       for (var comment in post.comments) {
         await db.insert('feed_comment', {
           'comment': comment.comment,
+          'username': comment.userName,
           'feed_id': postId,
         });
       }
