@@ -40,7 +40,7 @@ dependencies:
   path_provider: ^2.1.5
   cached_network_image: ^3.3.1
   intl: ^0.19.0
-  image_gallery_saver: ^2.0.3
+  #image_gallery_saver: ^2.0.3
   permission_handler: ^12.0.0
   device_info_plus: ^10.1.2
 
@@ -82,6 +82,16 @@ flutter:
         - asset: assets/fonts/poppins_regular.ttf
   assets:
     - assets/images/login_vector.svg
+    - assets/images/ic_create_post.svg
+    - assets/images/ic_logout.svg
+    - assets/images/ic_user.png
+    - assets/images/img_dummy_2.jpg
+    - assets/images/img_dummy_1.jpg
+    - assets/images/ic_heart.svg
+    - assets/images/ic_comment.svg
+    - assets/images/ic_heart_fill.svg
+    - assets/images/ic_download.svg
+    - assets/images/ic_send.svg
 
   # To add assets to your application, add an assets section, like this:
   # assets:
