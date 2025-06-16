@@ -1,16 +1,23 @@
 # kevit_insta_feed
 
-A new Flutter project.
+App Overview :
 
-## Getting Started
+The Application is designed as Insta/Twitter feed contains login screen , Feed Screen and Add Feed Screen , user can add multiple images with caption add show item list in feed view with refreshing feed ,user can like/dislike , comment and download image from the Feed , User can also Logout from the application.
 
-This project is a starting point for a Flutter application.
+Features :
 
-A few resources to get you started if this is your first Flutter project:
+Login
+Like/dislike Feed Post
+Comment Post
+Download Feed Images
+Add Feed
+Logout
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Tech Used :
+Flutter,Dart,Sqflite,Shared Preference
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+How To Run :
+flutter pub get
+flutter run
+
+Apk Link :
